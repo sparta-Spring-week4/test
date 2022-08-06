@@ -22,7 +22,7 @@ public class Scheduler {
     private final ImageRepository imageRepository;
 
     // 초, 분, 시, 일, 월, 주 순서
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void deleteFile() throws InterruptedException {
         System.out.println("이미지 삭제 실행");
         // 삭제할 이미지 조회
