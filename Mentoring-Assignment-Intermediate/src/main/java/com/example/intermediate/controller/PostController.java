@@ -48,7 +48,7 @@ public class PostController {
   @PostMapping("/api/auth/post/{id}/upload")
   public ResponseDto<?> uploadFile(
           @PathVariable Long id,
-          @RequestPart(value = "file") MultipartFile multipartFile) throws IOException {
+          @RequestPart(value = "Multipart") MultipartFile multipartFile) throws IOException {
     return ResponseDto.success(postService.uploadFileV1(id, multipartFile));
   }
 }

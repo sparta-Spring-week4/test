@@ -71,6 +71,7 @@ public class PostService {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
+            .imgUrl(post.getImage())
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
@@ -105,6 +106,7 @@ public class PostService {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
+            .imgUrl(post.getImage())
             .commentResponseDtoList(commentResponseDtoList)
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
@@ -206,11 +208,11 @@ public class PostService {
       amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
               .withCannedAcl(CannedAccessControlList.PublicRead));
     } catch (IOException e) {
-      throw new IOException();
+      throw new IOException("변환에 실패했습니다.");
     }
 
     Post post = postRepository.findById(postId).orElseThrow(
-            () -> new NullPointerException("아이디가 존재하지 않습니다.")
+            () -> new NullPointerException("존재하지 않는 게시글입니다.")
     );
     post.updateImage(amazonS3Client.getUrl(bucketName, fileName).toString());
     return post;
