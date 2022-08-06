@@ -9,5 +9,4 @@ import lombok.Setter;
 @Getter
 public class HeartRequestDto {
     private Long postId;
-    private Long memberId;
 }

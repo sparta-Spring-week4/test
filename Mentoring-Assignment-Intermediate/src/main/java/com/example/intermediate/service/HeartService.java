@@ -25,6 +25,7 @@ public class HeartService {
     private final MemberRepository memberRepository;
     private final PostService postService;
 
+
     // 좋아요 등록
     @Transactional
     public ResponseDto<?> getHeart(HeartRequestDto requestDto, UserDetailsImpl userDetails, HttpServletRequest request) {
@@ -34,23 +35,22 @@ public class HeartService {
                     "로그인이 필요합니다.");
         }
 
-        // 게시글 있는지 확인
-        Post post = postService.isPresentPost(requestDto.getPostId());
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
-        }
-
         // 좋아요를 눌렀는지 확인
-        Optional<Member> member = memberRepository.findById(requestDto.getMemberId());
-        Optional<Heart> memberExists = heartRepository.findByMember(member.get());
-        if (memberExists.isPresent()) {
-            return ResponseDto.fail("NOT_FOUND", "좋아요를 누른 게시글입니다.");
+        Post post = postService.isPresentPost(requestDto.getPostId());
+        Optional<Heart> postExists = heartRepository.findByPostAndMember(post, userDetails.getMember());
+//
+//        if(postExists.orElse(null) == null){
+//            return ResponseDto.fail("NOT_FOUND", "로그인을 하세요.");
+//        }
+
+        if (postExists.isPresent()) {
+            return ResponseDto.fail("NOT_FOUND", "이미 좋아요를 누른 게시글입니다.");
         }
 
         //좋아요 저장
         Heart heart = Heart.builder()
                 .post(post)
-                .member(member.get())
+                .member(userDetails.getMember())
                 .build();
 
         heartRepository.save(heart);
@@ -69,22 +69,16 @@ public class HeartService {
                     "로그인이 필요합니다.");
         }
 
-        // 게시글 있는지 확인
-        Post post = postService.isPresentPost(requestDto.getPostId());
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
-        }
-
         // 좋아요를 눌렀는지 확인
-        Optional<Member> member = memberRepository.findById(requestDto.getMemberId());
-        Optional<Heart> memberExists = heartRepository.findByMember(member.get());
-        if (memberExists.isEmpty()) {
-            return ResponseDto.fail("NOT_FOUND", "좋아요를 누르지 않은 게시글입니다.");
+        Post post = postService.isPresentPost(requestDto.getPostId());
+        Optional<Heart> postExists = heartRepository.findByPostAndMember(post, userDetails.getMember());
+
+        if (postExists.isEmpty()) {
+            return ResponseDto.fail("NOT_FOUND", "좋아요를 하지 않은 게시글입니다.");
         }
 
         //좋아요 삭제
-        heartRepository.save(memberExists.get());
-
+        heartRepository.deleteByPostAndMember(post, userDetails.getMember());
 
         return ResponseDto.success("좋아요를 취소했습니다.");
     }

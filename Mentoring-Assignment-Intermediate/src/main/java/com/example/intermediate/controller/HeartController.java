@@ -26,7 +26,7 @@ public class HeartController {
                                     @AuthenticationPrincipal UserDetailsImpl userDetails,
                                     HttpServletRequest request){
 
-        return ResponseDto.success(heartService.getHeart(heartRequestDto, userDetails, request));
+        return ResponseDto.success(heartService.getHeart(heartRequestDto, userDetails,request));
     }
 
     //좋아요 삭제 API
