@@ -2,16 +2,8 @@ package com.example.intermediate.domain;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,7 +27,7 @@ public class Post extends Timestamped {
   private String content;
 
   @Column
-  private String image;
+  private String imgUrl;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comments;
@@ -47,7 +39,7 @@ public class Post extends Timestamped {
   public void update(PostRequestDto postRequestDto) {
     this.title = postRequestDto.getTitle();
     this.content = postRequestDto.getContent();
-    this.image="";
+    this.imgUrl="";
   }
 
   public boolean validateMember(Member member) {
@@ -55,6 +47,6 @@ public class Post extends Timestamped {
   }
 
   public void updateImage(String image){
-    this.image = image;
+    this.imgUrl = image;
   }
 }

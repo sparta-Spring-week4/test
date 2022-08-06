@@ -2,18 +2,17 @@ package com.example.intermediate.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.intermediate.controller.response.CommentResponseDto;
 import com.example.intermediate.controller.response.PostResponseDto;
-import com.example.intermediate.domain.Comment;
-import com.example.intermediate.domain.CommonUtils;
-import com.example.intermediate.domain.Member;
-import com.example.intermediate.domain.Post;
+import com.example.intermediate.domain.*;
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.CommentRepository;
+import com.example.intermediate.repository.ImageRepository;
 import com.example.intermediate.repository.PostRepository;
 
 import java.io.IOException;
@@ -40,6 +39,7 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final CommentRepository commentRepository;
+  private final ImageRepository imageRepository;
 
   private final TokenProvider tokenProvider;
 
@@ -71,7 +71,7 @@ public class PostService {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
-            .imgUrl(post.getImage())
+            .imgUrl(post.getImgUrl())
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
@@ -106,7 +106,7 @@ public class PostService {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
-            .imgUrl(post.getImage())
+            .imgUrl(post.getImgUrl())
             .commentResponseDtoList(commentResponseDtoList)
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
@@ -176,6 +176,8 @@ public class PostService {
       return ResponseDto.fail("BAD_REQUEST", "작성자만 삭제할 수 있습니다.");
     }
 
+    Image image = new Image(post.getImgUrl());
+    imageRepository.save(image);
     postRepository.delete(post);
     return ResponseDto.success("delete success");
   }
@@ -217,6 +219,7 @@ public class PostService {
     post.updateImage(amazonS3Client.getUrl(bucketName, fileName).toString());
     return post;
   }
+
 
   private void validateFileExists(MultipartFile multipartFile) throws IOException {
     if (multipartFile.isEmpty()) {
