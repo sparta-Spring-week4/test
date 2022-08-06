@@ -27,7 +27,7 @@ public class RefreshToken extends Timestamped {
   @OneToOne(fetch = FetchType.LAZY)
   private Member member;
 
-  @Column(nullable = false)
+  @Column(nullable = false, name = "val")
   private String value;
 
   public void updateValue(String token) {

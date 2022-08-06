@@ -2,14 +2,14 @@ package com.example.intermediate.controller;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
+import com.example.intermediate.domain.Post;
 import com.example.intermediate.service.PostService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -45,4 +45,10 @@ public class PostController {
     return postService.deletePost(id, request);
   }
 
+  @PostMapping("/api/auth/post/{id}/upload")
+  public ResponseDto<?> uploadFile(
+          @PathVariable Long id,
+          @RequestPart(value = "file") MultipartFile multipartFile) throws IOException {
+    return ResponseDto.success(postService.uploadFileV1(id, multipartFile));
+  }
 }
