@@ -30,15 +30,13 @@ public class Post extends Timestamped {
 
   @Column(nullable = false)
   private String title;
-
+  @Column
+  private Long heartCount;
   @Column(nullable = false)
   private String content;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comments;
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Heart> hearts;
 
   @JoinColumn(name = "member_id", nullable = false)
   @ManyToOne(fetch = FetchType.LAZY)
@@ -51,6 +49,11 @@ public class Post extends Timestamped {
 
   public boolean validateMember(Member member) {
     return !this.member.equals(member);
+  }
+
+  public void heartUpdate(Long heartCount){
+    System.out.println(heartCount);
+    this.heartCount = heartCount;
   }
 
 }
