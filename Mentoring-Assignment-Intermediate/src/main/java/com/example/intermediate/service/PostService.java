@@ -1,6 +1,7 @@
 package com.example.intermediate.service;
 
 import com.example.intermediate.controller.response.CommentResponseDto;
+import com.example.intermediate.controller.response.PostListResponseDto;
 import com.example.intermediate.controller.response.PostResponseDto;
 import com.example.intermediate.domain.Comment;
 import com.example.intermediate.domain.Member;
@@ -11,6 +12,7 @@ import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.CommentRepository;
 import com.example.intermediate.repository.PostRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -93,13 +95,32 @@ public class PostService {
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
+            .heartCount(post.getHeartCount())
             .build()
     );
   }
 
   @Transactional(readOnly = true)
   public ResponseDto<?> getAllPost() {
-    return ResponseDto.success(postRepository.findAllByOrderByModifiedAtDesc());
+    List<Post> postList = postRepository.findAllByOrderByModifiedAtDesc();
+    List<PostListResponseDto> postResponseDtoList = new ArrayList<>();
+
+    for(Post post : postList){
+      postResponseDtoList.add(
+        PostListResponseDto.builder()
+              .id(post.getId())
+              .title(post.getTitle())
+              .author(post.getMember().getNickname())
+              .heartCount(post.getHeartCount())
+              .commentCount((long) post.getComments().size())
+              .createdAt(post.getCreatedAt())
+              .modifiedAt(post.getModifiedAt())
+              .build()
+      );
+    }
+
+    return ResponseDto.success(postResponseDtoList);
+
   }
 
   @Transactional
