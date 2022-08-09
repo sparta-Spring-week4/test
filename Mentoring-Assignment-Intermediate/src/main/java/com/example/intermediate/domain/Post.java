@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Builder
 @Getter
@@ -32,6 +33,7 @@ public class Post extends Timestamped {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comments;
 
+
   @JoinColumn(name = "member_id", nullable = false)
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
@@ -49,4 +51,7 @@ public class Post extends Timestamped {
   public void updateImage(String image){
     this.imgUrl = image;
   }
+
+
+
 }
