@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.util.IOUtils;
 import com.example.intermediate.controller.response.CommentResponseDto;
 import com.example.intermediate.controller.response.PostResponseDto;
 import com.example.intermediate.domain.*;
@@ -15,6 +16,7 @@ import com.example.intermediate.repository.CommentRepository;
 import com.example.intermediate.repository.ImageRepository;
 import com.example.intermediate.repository.PostRepository;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -176,7 +178,9 @@ public class PostService {
       return ResponseDto.fail("BAD_REQUEST", "작성자만 삭제할 수 있습니다.");
     }
 
+    System.out.println(post.getImgUrl());
     Image image = new Image(post.getImgUrl());
+
     imageRepository.save(image);
     postRepository.delete(post);
     return ResponseDto.success("delete success");
@@ -197,7 +201,9 @@ public class PostService {
   }
 
 
+
   //image upload
+  @Transactional
   public Post uploadFileV1(Long postId, MultipartFile multipartFile) throws IOException {
     validateFileExists(multipartFile);
 
@@ -206,9 +212,15 @@ public class PostService {
     ObjectMetadata objectMetadata = new ObjectMetadata();
     objectMetadata.setContentType(multipartFile.getContentType());
 
+
+
+
     try (InputStream inputStream = multipartFile.getInputStream()) {
-      amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
-              .withCannedAcl(CannedAccessControlList.PublicRead));
+      byte[] bytes = IOUtils.toByteArray(inputStream);
+      objectMetadata.setContentLength(bytes.length);
+      ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+      amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, byteArrayInputStream, objectMetadata)
+              .withCannedAcl(CannedAccessControlList.PublicReadWrite));
     } catch (IOException e) {
       throw new IOException("변환에 실패했습니다.");
     }
@@ -216,10 +228,23 @@ public class PostService {
     Post post = postRepository.findById(postId).orElseThrow(
             () -> new NullPointerException("존재하지 않는 게시글입니다.")
     );
-    post.updateImage(amazonS3Client.getUrl(bucketName, fileName).toString());
+    String imgName = amazonS3Client.getUrl(bucketName, fileName).toString();
+    post.updateImage(imgName);
     return post;
   }
 
+  public Boolean deleteS3(Long id){
+    Post post = postRepository.findById(id).orElseThrow(
+            () -> new NullPointerException("존재하지 않는 게시글입니다.")
+    );
+    String imgUrl = post.getImgUrl();
+    String head = "https://magorosc.s3.ap-northeast-2.amazonaws.com/";
+    String key = imgUrl.substring(head.length());
+    System.out.println(bucketName + " " + key);
+    amazonS3Client.deleteObject(bucketName,key);
+
+    return true;
+  }
 
   private void validateFileExists(MultipartFile multipartFile) throws IOException {
     if (multipartFile.isEmpty()) {

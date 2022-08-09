@@ -17,6 +17,7 @@ public class PostController {
 
   private final PostService postService;
 
+
   @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
   public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,
       HttpServletRequest request) {
@@ -45,10 +46,12 @@ public class PostController {
     return postService.deletePost(id, request);
   }
 
-  @PostMapping("/api/auth/post/{id}/upload")
+  @PutMapping("/api/auth/post/{id}/image")
   public ResponseDto<?> uploadFile(
           @PathVariable Long id,
           @RequestPart(value = "Multipart") MultipartFile multipartFile) throws IOException {
     return ResponseDto.success(postService.uploadFileV1(id, multipartFile));
   }
+
+
 }
