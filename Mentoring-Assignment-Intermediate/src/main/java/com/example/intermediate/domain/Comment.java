@@ -36,11 +36,19 @@ public class Comment extends Timestamped {
   @Column(nullable = false)
   private String content;
 
+  @Column
+  private Long commentHeartCount;
+
   public void update(CommentRequestDto commentRequestDto) {
     this.content = commentRequestDto.getContent();
   }
 
   public boolean validateMember(Member member) {
     return !this.member.equals(member);
+  }
+
+  public void commentHeartUpdate(Long heartCount){
+    this.commentHeartCount = heartCount;
+    System.out.println("commentHeartCount: " + commentHeartCount);
   }
 }

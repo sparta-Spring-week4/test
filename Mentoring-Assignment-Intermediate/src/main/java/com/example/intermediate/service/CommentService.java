@@ -75,6 +75,7 @@ public class CommentService {
     List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
     for (Comment comment : commentList) {
+          System.out.println("countㅏㅣㅓㅏㅇ너ㅣㅏㅓㄴ미라ㅡ이ㅏㅓ리ㅏ머내랴너아ㅣㅜㄴ미ㅏ으: " + comment.getCommentHeartCount());
       commentResponseDtoList.add(
           CommentResponseDto.builder()
               .id(comment.getId())
@@ -82,6 +83,7 @@ public class CommentService {
               .content(comment.getContent())
               .createdAt(comment.getCreatedAt())
               .modifiedAt(comment.getModifiedAt())
+              .commentHeartCount(comment.getCommentHeartCount())
               .build()
       );
     }

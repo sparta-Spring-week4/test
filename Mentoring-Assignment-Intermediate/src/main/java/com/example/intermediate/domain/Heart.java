@@ -27,4 +27,8 @@ public class Heart {
     @ManyToOne
     private Post post;
 
+    @JoinColumn(name="comment_id")
+    @ManyToOne
+    private Comment comment;
+
 }

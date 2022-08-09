@@ -18,20 +18,20 @@ public class HeartController {
     private final HeartService heartService;
 
     // 좋아요 기능 API
-    @PostMapping("/api/auth/heart/post/{postId}")
-    public ResponseDto<?> saveHeart(@PathVariable Long postId,
+    @PostMapping("/api/auth/heart")
+    public ResponseDto<?> saveHeart(@RequestBody HeartRequestDto requestDto,
                                     @AuthenticationPrincipal UserDetailsImpl userDetails,
                                     HttpServletRequest request){
 
-        return ResponseDto.success(heartService.getPostHeart(postId, userDetails,request));
+        return ResponseDto.success(heartService.getPostHeart(requestDto, userDetails,request));
     }
 
     //좋아요 삭제 API
-    @DeleteMapping("/heart")
-    public ResponseDto<?> deleteHeart(@RequestBody HeartRequestDto heartRequestDto,
+    @DeleteMapping("/api/auth/heart")
+    public ResponseDto<?> deleteHeart(@RequestBody HeartRequestDto requestDto,
                                     @AuthenticationPrincipal UserDetailsImpl userDetails,
                                     HttpServletRequest request){
 
-        return ResponseDto.success(heartService.deleteHeart(heartRequestDto, userDetails, request));
+        return ResponseDto.success(heartService.deletePostHeart(requestDto, userDetails, request));
     }
 }

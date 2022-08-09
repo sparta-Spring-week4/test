@@ -31,7 +31,7 @@ public class Post extends Timestamped {
   @Column(nullable = false)
   private String title;
   @Column
-  private Long heartCount;
+  private Long postHeartCount;
   @Column(nullable = false)
   private String content;
 
@@ -52,8 +52,7 @@ public class Post extends Timestamped {
   }
 
   public void heartUpdate(Long heartCount){
-    System.out.println(heartCount);
-    this.heartCount = heartCount;
+    this.postHeartCount = heartCount;
   }
 
 }

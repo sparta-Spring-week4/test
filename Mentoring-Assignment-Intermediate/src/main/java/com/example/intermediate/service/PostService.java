@@ -12,7 +12,6 @@ import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.CommentRepository;
 import com.example.intermediate.repository.PostRepository;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -82,6 +81,7 @@ public class PostService {
               .content(comment.getContent())
               .createdAt(comment.getCreatedAt())
               .modifiedAt(comment.getModifiedAt())
+              .commentHeartCount(comment.getCommentHeartCount())
               .build()
       );
     }
@@ -95,7 +95,7 @@ public class PostService {
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
-            .heartCount(post.getHeartCount())
+            .postHeartCount(post.getPostHeartCount())
             .build()
     );
   }
@@ -105,13 +105,24 @@ public class PostService {
     List<Post> postList = postRepository.findAllByOrderByModifiedAtDesc();
     List<PostListResponseDto> postResponseDtoList = new ArrayList<>();
 
+//    List<Comment> commentList = new ArrayList<>();
+//
+//    for(Post post : postList){
+//      List<Comment> postCommentList = post.getComments();
+//      for(Comment comment : postCommentList){
+//        if(comment.getFrentId() == null){
+//
+//        }
+//      }
+//    }
+
     for(Post post : postList){
       postResponseDtoList.add(
         PostListResponseDto.builder()
               .id(post.getId())
               .title(post.getTitle())
               .author(post.getMember().getNickname())
-              .heartCount(post.getHeartCount())
+              .postHeartCount(post.getPostHeartCount())
               .commentCount((long) post.getComments().size())
               .createdAt(post.getCreatedAt())
               .modifiedAt(post.getModifiedAt())

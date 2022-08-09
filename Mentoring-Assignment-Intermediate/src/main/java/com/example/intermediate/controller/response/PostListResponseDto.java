@@ -15,7 +15,7 @@ public class PostListResponseDto {
     private Long id;
     private String title;
     private String author;
-    private Long heartCount;
+    private Long postHeartCount;
     private Long commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

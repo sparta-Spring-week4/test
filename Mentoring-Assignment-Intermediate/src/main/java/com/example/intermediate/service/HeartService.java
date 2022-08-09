@@ -1,17 +1,14 @@
 package com.example.intermediate.service;
 
 import com.example.intermediate.controller.request.HeartRequestDto;
-import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
+import com.example.intermediate.domain.Comment;
 import com.example.intermediate.domain.Heart;
-import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.Post;
 import com.example.intermediate.domain.UserDetailsImpl;
 import com.example.intermediate.repository.HeartRepository;
-import com.example.intermediate.repository.MemberRepository;
 import com.example.intermediate.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,56 +21,75 @@ import java.util.Optional;
 public class HeartService {
 
     private final HeartRepository heartRepository;
-    private final PostRepository postRepository;
     private final PostService postService;
+    private final CommentService commentService;
 
 
     // 좋아요 등록
     @Transactional
-    public ResponseDto<?> getPostHeart(Long postId, UserDetailsImpl userDetails, HttpServletRequest request) {
+    public ResponseDto<?> getPostHeart(HeartRequestDto requestDto, UserDetailsImpl userDetails, HttpServletRequest request) {
         // 로그인 체크
         if (null == request.getHeader("Refresh-Token") || null == request.getHeader("Authorization")) {
             return ResponseDto.fail("MEMBER_NOT_FOUND",
                     "로그인이 필요합니다.");
         }
 
-        // 좋아요를 눌렀는지 확인
-        Post post = postService.isPresentPost(postId);
-        Optional<Heart> postExists = heartRepository.findByPostAndMember(post, userDetails.getMember());
-        if (postExists.isPresent()) {
-            return ResponseDto.fail("NOT_FOUND", "이미 좋아요를 누른 게시글입니다.");
+        //게시글 좋아요
+        if(requestDto.getPostId() > 0 && requestDto.getCommentId() == null){
+            Post post = postService.isPresentPost(requestDto.getPostId());
+            Optional<Heart> postExists = heartRepository.findByPostAndMember(post, userDetails.getMember());
+            if (postExists.isPresent()) {
+                return ResponseDto.fail("NOT_FOUND", "이미 좋아요를 누른 게시글입니다.");
+            }
+
+            //게시글 존재 확인
+            if (null == post) {
+                return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
+            }
+
+            //게시글 좋아요 저장
+            Heart heart = Heart.builder()
+                    .post(post)
+                    .member(userDetails.getMember())
+                    .build();
+
+            heartRepository.save(heart);
+
+            // 게시글에 좋아요 수 보내기
+            List<Heart> heartList = heartRepository.findByPostId(requestDto.getPostId());
+            post.heartUpdate((long) heartList.size());
+
+            return ResponseDto.success("게시글에 좋아요를 눌렀습니다.");
         }
 
-        //게시글 존재 확인
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
+        //댓글 좋아요
+        if(requestDto.getPostId() != null && requestDto.getCommentId() != null){
+            Comment comment = commentService.isPresentComment(requestDto.getCommentId());
+            Optional<Heart> commentExists = heartRepository.findByCommentAndMember(comment, userDetails.getMember());
+            if (commentExists.isPresent()) {
+                return ResponseDto.fail("NOT_FOUND", "이미 좋아요를 누른 댓글입니다.");
+            }
+
+            //댓글 존재 확인
+            if (null == comment) {
+                return ResponseDto.fail("NOT_FOUND", "존재하지 않는 댓글 id 입니다.");
+            }
+
+            //댓글 좋아요 저장
+            Heart heart = Heart.builder()
+                    .comment(comment)
+                    .member(userDetails.getMember())
+                    .build();
+
+            heartRepository.save(heart);
+
+            // 댓글에 좋아요 수 보내기
+            List<Heart> commentHeartList = heartRepository.findByCommentId(requestDto.getCommentId());
+            System.out.println("comment heart : " + commentHeartList.size());
+            comment.commentHeartUpdate((long) commentHeartList.size());
+
+            return ResponseDto.success("댓글에 좋아요를 눌렀습니다.");
         }
-
-        //좋아요 저장
-        Heart heart = Heart.builder()
-                .post(post)
-                .member(userDetails.getMember())
-                .build();
-
-        heartRepository.save(heart);
-
-        // 좋아요 수
-        List<Heart> heartList = heartRepository.findByPostId(postId);
-        post.heartUpdate((long) heartList.size());
-
-//        public void updateHeartCount(String campaignId, Integer plusOrMinus) throws IOException {
-//
-//            Optional<Campaign> campaignOpt = campaignRepository.findById(campaignId);
-//            if (campaignOpt.isEmpty()) {
-//                throw new CustomException(CAMPAIGN_NOT_FOUND);
-//            }
-//
-//            UpdateRequest request = new UpdateRequest("campaigns", campaignId)
-//                    .doc("heart_count", campaignOpt.get().getHeartCount() + plusOrMinus);
-//
-//            UpdateResponse response = elasticsearchClient.update(request, RequestOptions.DEFAULT);
-//            log.info("ES heartCount update response = {}", response);
-//        }
 
 
         return ResponseDto.success("좋아요를 눌렀습니다.");
@@ -82,22 +98,47 @@ public class HeartService {
 
     // 좋아요 취소
     @Transactional
-    public ResponseDto<?> deleteHeart(HeartRequestDto requestDto, UserDetailsImpl userDetails, HttpServletRequest request) {
+    public ResponseDto<?> deletePostHeart(HeartRequestDto requestDto, UserDetailsImpl userDetails, HttpServletRequest request) {
         // 로그인 체크
         if (null == request.getHeader("Refresh-Token") || null == request.getHeader("Authorization")) {
             return ResponseDto.fail("MEMBER_NOT_FOUND",
                     "로그인이 필요합니다.");
         }
 
-        // 좋아요를 눌렀는지 확인
-        Post post = postService.isPresentPost(requestDto.getPostId());
-        Optional<Heart> postExists = heartRepository.findByPostAndMember(post, userDetails.getMember());
-        if (postExists.isEmpty()) {
-            return ResponseDto.fail("NOT_FOUND", "좋아요를 하지 않은 게시글입니다.");
+        // 게시글 좋아요 취소
+        if(requestDto.getPostId() > 0 && requestDto.getCommentId() == null) {
+
+            // 좋아요를 눌렀는지 확인
+            Post post = postService.isPresentPost(requestDto.getPostId());
+            Optional<Heart> postExists = heartRepository.findByPostAndMember(post, userDetails.getMember());
+            if (postExists.isEmpty()) {
+                return ResponseDto.fail("NOT_FOUND", "좋아요를 하지 않은 게시글입니다.");
+            }
+
+            //좋아요 삭제
+            heartRepository.deleteByPostAndMember(post, userDetails.getMember());
+
+            // 게시글에 좋아요 수 보내기
+            List<Heart> heartList = heartRepository.findByPostId(requestDto.getPostId());
+            post.heartUpdate((long) heartList.size());
         }
 
-        //좋아요 삭제
-        heartRepository.deleteByPostAndMember(post, userDetails.getMember());
+        // 댓글 좋아요 취소
+        if(requestDto.getPostId() != null && requestDto.getCommentId() != null) {
+            // 좋아요를 눌렀는지 확인
+            Comment comment = commentService.isPresentComment(requestDto.getCommentId());
+            Optional<Heart> commentExists = heartRepository.findByCommentAndMember(comment, userDetails.getMember());
+            if (commentExists.isEmpty()) {
+                return ResponseDto.fail("NOT_FOUND", "좋아요를 하지 않은 게시글입니다.");
+            }
+
+            //좋아요 삭제
+            heartRepository.deleteByCommentAndMember(comment, userDetails.getMember());
+
+            // 게시글에 좋아요 수 보내기
+            List<Heart> heartList = heartRepository.findByCommentId(requestDto.getCommentId());
+            comment.commentHeartUpdate((long) heartList.size());
+        }
 
         return ResponseDto.success("좋아요를 취소했습니다.");
     }
