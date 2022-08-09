@@ -44,11 +44,13 @@ public class SecurityConfiguration {
     http.cors();
 
     http.csrf().disable()
-
+        .headers()
+        .frameOptions()
+        .sameOrigin()
+        .and()
         .exceptionHandling()
         .authenticationEntryPoint(authenticationEntryPointException)
         .accessDeniedHandler(accessDeniedHandlerException)
-
         .and()
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -58,6 +60,7 @@ public class SecurityConfiguration {
         .antMatchers("/api/member/**").permitAll()
         .antMatchers("/api/post/**").permitAll()
         .antMatchers("/api/comment/**").permitAll()
+        .antMatchers("/h2-console/**").permitAll()
         .anyRequest().authenticated()
 
         .and()

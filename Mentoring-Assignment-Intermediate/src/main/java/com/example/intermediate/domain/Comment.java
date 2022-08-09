@@ -1,18 +1,18 @@
 package com.example.intermediate.domain;
 
 import com.example.intermediate.controller.request.CommentRequestDto;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+
+import javax.persistence.*;
+
+import com.example.intermediate.controller.response.CommentResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Parent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -36,8 +36,21 @@ public class Comment extends Timestamped {
   @Column(nullable = false)
   private String content;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parent_id")
+  private Comment parent;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "parent", orphanRemoval = true)
+  private List<Comment> children = new ArrayList<>();
+
   public void update(CommentRequestDto commentRequestDto) {
     this.content = commentRequestDto.getContent();
+  }
+
+  // 부모 댓글 수정
+  public void updateParent(Comment parent){
+    this.parent = parent;
   }
 
   public boolean validateMember(Member member) {
