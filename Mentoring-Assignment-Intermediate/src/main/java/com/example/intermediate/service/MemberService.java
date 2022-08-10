@@ -122,7 +122,13 @@ public class MemberService {
                       .id(post.getId())
                       .title(post.getTitle())
                       .content(post.getContent())
+<<<<<<< HEAD
                       .postHeartCount(post.getPostHeartCount())
+=======
+                      .imgUrl(post.getImgUrl())
+                      .postHeartCount(post.getPostHeartCount())
+                      .author(userDetails.getUsername())
+>>>>>>> ecc94298dc0cbf2a91e7562c048e2eab1f1864ce
                       .createdAt(post.getCreatedAt())
                       .modifiedAt(post.getModifiedAt())
                       .build()
