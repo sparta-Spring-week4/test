@@ -1,21 +1,23 @@
 package com.example.intermediate.service;
 
-import com.example.intermediate.controller.response.MemberResponseDto;
+import com.example.intermediate.controller.response.*;
 import com.example.intermediate.domain.Member;
-import com.example.intermediate.domain.RefreshToken;
+import com.example.intermediate.domain.Post;
 import com.example.intermediate.controller.request.LoginRequestDto;
 import com.example.intermediate.controller.request.MemberRequestDto;
-import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.controller.request.TokenDto;
+import com.example.intermediate.domain.UserDetailsImpl;
 import com.example.intermediate.jwt.TokenProvider;
+import com.example.intermediate.repository.CommentRepository;
 import com.example.intermediate.repository.MemberRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
+
+import com.example.intermediate.repository.PostRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +25,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MemberService {
-
+  private final PostRepository postRepository;
   private final MemberRepository memberRepository;
-
+  private final CommentRepository commentRepository;
   private final PasswordEncoder passwordEncoder;
 //  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
 
-  MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider){
+  MemberService(PostRepository postRepository, MemberRepository memberRepository, CommentRepository commentRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider){
+    this.postRepository = postRepository;
     this.memberRepository = memberRepository;
+    this.commentRepository = commentRepository;
     this. passwordEncoder = passwordEncoder;
     this.tokenProvider = tokenProvider;
   }
@@ -127,6 +131,76 @@ public class MemberService {
     }
 
     return tokenProvider.deleteRefreshToken(member);
+  }
+
+  @Transactional
+  public ResponseDto<?> getAllMemberHist(UserDetailsImpl userDetails) {
+
+    List<Post> myPostList = postRepository.findAllByMemberId(userDetails.getMember().getId()); // 빌더
+    List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+
+    for (Post post : myPostList) {
+      postResponseDtoList.add(
+              PostResponseDto.builder()
+                      .id(post.getId())
+                      .title(post.getTitle())
+                      .content(post.getContent())
+                      .createdAt(post.getCreatedAt())
+                      .modifiedAt(post.getModifiedAt())
+                      .build()
+      );
+    }
+
+
+    List<CommentResponseDto> myCommentList = commentRepository.findAllByMemberId(userDetails.getMember().getId());
+
+    return ResponseDto.success(
+            MemberHistResponseDto.builder()
+                    .id(userDetails.getMember().getId())
+                    .author(userDetails.getUsername())
+                    .postList(postResponseDtoList)
+                    .commentList(myCommentList)
+                    .build()
+    );
+  }
+//  @Transactional
+//  public ResponseDto<?> MypagePost(HttpServletRequest request) {
+//    if (null == request.getHeader("Refresh-Token")){
+//      return  ResponseDto.fail("NOT_FOUND","로그인이 필요합니다.");
+//    }
+//    if (null == request.getHeader("Authorization")){
+//      return  ResponseDto.fail("NOT_FOUND","로그인이 필요합니다.");
+//    }
+//    Member member = validateMember(request);
+//    if (null == member){
+//      return  ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+//    }
+//
+//    List<Post> postList = postRepository.findByMemberId(member.getId());
+//    List<MypagePostResponseDto> mypagePostResponseDto = new ArrayList<>();
+//
+//    // 게시글 목록 조회 response
+//    for(Post post : postList){
+//      mypagePostResponseDto.add(
+//              MypagePostResponseDto.builder()
+//                      .id(post.getId())
+//                      .title(post.getTitle())
+//                      .author(post.getMember().getNickname())
+//                      .postHeartCount(post.getPostHeartCount())
+//                      .createdAt(post.getCreatedAt())
+//                      .modifiedAt(post.getModifiedAt())
+//                      .build()
+//      );
+//    }
+//    return ResponseDto.success(mypagePostResponseDto);
+//  }
+
+  @Transactional
+  public Member validateMember(HttpServletRequest request) {
+    if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+      return null;
+    }
+    return tokenProvider.getMemberFromAuthentication();
   }
 
   @Transactional(readOnly = true)

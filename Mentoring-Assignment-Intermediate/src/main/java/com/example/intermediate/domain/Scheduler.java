@@ -22,7 +22,7 @@ public class Scheduler {
 
 
     // 초, 분, 시, 일, 월, 주 순서
-    @Scheduled(cron = "*/5 * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void deleteFile(){
         System.out.println("안쓰는 게시물 삭제");
         List<Post> posts = postRepository.findEmptyPost();
