@@ -24,6 +24,6 @@ public class MemberHistResponseDto {
     private List<CommentResponseDto> commentList;  // 작성한 댓글 리스트
     // ----- 아래는 좋아요 누른 리스트 -----
     private List<Post> likedPostList;  // 좋아요 누른 게시글 리스트
-    private List<Comment> likedCommentList;  // 좋아요 누른 댓글 리스트
+    private List<CommentResponseDto> likedCommentList;  // 좋아요 누른 댓글 리스트
 
 }

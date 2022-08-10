@@ -1,6 +1,7 @@
 package com.example.intermediate.service;
 
 import com.example.intermediate.controller.response.*;
+import com.example.intermediate.domain.Comment;
 import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.Post;
 import com.example.intermediate.controller.request.LoginRequestDto;
@@ -9,6 +10,7 @@ import com.example.intermediate.controller.request.TokenDto;
 import com.example.intermediate.domain.UserDetailsImpl;
 import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.CommentRepository;
+import com.example.intermediate.repository.HeartRepository;
 import com.example.intermediate.repository.MemberRepository;
 
 import java.util.ArrayList;
@@ -120,6 +122,7 @@ public class MemberService {
                       .id(post.getId())
                       .title(post.getTitle())
                       .content(post.getContent())
+                      .postHeartCount(post.getPostHeartCount())
                       .createdAt(post.getCreatedAt())
                       .modifiedAt(post.getModifiedAt())
                       .build()
@@ -128,6 +131,22 @@ public class MemberService {
 
 
     List<CommentResponseDto> myCommentList = commentRepository.findAllByMemberId(userDetails.getMember().getId());
+    List<CommentResponseDto> myCommentList1 = commentRepository.findAllByMemberId(userDetails.getMember().getId());
+
+    List<Post> mylikedPostList = postRepository.findAllByMemberId(userDetails.getMember().getId());
+    List<Post> postResponseDtoLikeList = new ArrayList<>();
+
+    for (Post post : mylikedPostList){
+      postResponseDtoLikeList.add(
+              Post.builder()
+                      .id(post.getId())
+                      .title(post.getTitle())
+                      .content(post.getContent())
+                      .postHeartCount(post.getPostHeartCount())
+                      .build()
+      );
+    }
+
 
     return ResponseDto.success(
             MemberHistResponseDto.builder()
@@ -135,6 +154,8 @@ public class MemberService {
                     .author(userDetails.getUsername())
                     .postList(postResponseDtoList)
                     .commentList(myCommentList)
+                    .likedPostList(postResponseDtoLikeList)
+                    .likedCommentList(myCommentList1)
                     .build()
     );
   }

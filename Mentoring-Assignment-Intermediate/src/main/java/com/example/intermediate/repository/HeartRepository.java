@@ -20,5 +20,4 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
     List<Heart> findByCommentId(Long commentId);
     void deleteByCommentAndMember(Comment comment, Member member);
 
-
 }
