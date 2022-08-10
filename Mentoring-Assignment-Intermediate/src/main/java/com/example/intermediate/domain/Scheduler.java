@@ -1,13 +1,7 @@
 package com.example.intermediate.domain;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.example.intermediate.repository.CommentRepository;
-import com.example.intermediate.repository.ImageRepository;
 import com.example.intermediate.repository.PostRepository;
-import com.example.intermediate.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

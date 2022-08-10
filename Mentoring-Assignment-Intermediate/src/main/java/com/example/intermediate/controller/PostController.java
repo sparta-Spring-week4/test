@@ -47,12 +47,6 @@ public class PostController {
     return postService.deletePost(id, request);
   }
 
-  @PutMapping("/api/auth/post/{id}/image")
-  public ResponseDto<?> uploadFile(
-          @PathVariable Long id,
-          @RequestPart(value = "Multipart") MultipartFile multipartFile) throws IOException {
-    return postService.uploadFileV1(id, multipartFile);
-  }
 
 //  @RequestMapping(value = "/api/auth/post/MypagePost", method = RequestMethod.GET)
 //  public ResponseDto<?> myPage(HttpServletRequest request) {
