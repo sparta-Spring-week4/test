@@ -25,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 public class Comment extends Timestamped {
-
+//ㅎㅎ
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
