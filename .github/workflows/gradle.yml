@@ -43,9 +43,6 @@ jobs:
         aws-region: ap-northeast-2
         cloud-aws-credentials-accessKey : ${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }}
         cloud-aws-credentials-secretKey : ${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }}
-        cloud-aws-s3-bucket : magorosc
-        cloud-aws-region-static : ap-northeast-2
-        cloud-aws-stack-auto : false
 
     # (5) 빌드 결과물을 S3 버킷에 업로드
     - name: Upload to AWS S3
