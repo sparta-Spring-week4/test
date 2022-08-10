@@ -1,1 +1,0 @@
-# Mentoring-Assignment-Intermediate
