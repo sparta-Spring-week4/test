@@ -58,6 +58,11 @@ dependencies {
 
 }
 
+// -plain.jar 생성 안되게
+jar {
+    enabled = false
+}
+
 /*
  * queryDSL 설정 추가
  */
