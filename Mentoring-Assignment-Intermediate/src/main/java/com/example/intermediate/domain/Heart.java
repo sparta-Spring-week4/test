@@ -1,6 +1,6 @@
 package com.example.intermediate.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.intermediate.controller.request.HeartRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,20 +10,25 @@ import javax.persistence.*;
 
 @Builder
 @Getter
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Image {
+public class Heart {
+
     @Id
-    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String imgUrl;
+    @JoinColumn(name="member_id")
+    @ManyToOne
+    private Member member;
 
-    public Image(String imgUrl){
-        this.imgUrl=imgUrl;
-    }
+    @JoinColumn(name="post_id")
+    @ManyToOne
+    private Post post;
+
+    @JoinColumn(name="comment_id")
+    @ManyToOne
+    private Comment comment;
 
 }

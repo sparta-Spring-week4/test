@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 @Builder
 @Getter
@@ -28,30 +27,40 @@ public class Post extends Timestamped {
   private String content;
 
   @Column
-  private String imgUrl;
+  @Builder.Default
+  private Long postHeartCount = 0L;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comments;
 
+  private String imgUrl;
 
   @JoinColumn(name = "member_id", nullable = false)
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
 
+  @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Heart> hearts;
+
   public void update(PostRequestDto postRequestDto) {
     this.title = postRequestDto.getTitle();
     this.content = postRequestDto.getContent();
-    this.imgUrl="";
+    this.imgUrl= postRequestDto.getImgUrl();
   }
 
   public boolean validateMember(Member member) {
+
     return !this.member.equals(member);
+  }
+
+
+  public void heartUpdate(Long heartCount){
+    this.postHeartCount = heartCount;
   }
 
   public void updateImage(String image){
     this.imgUrl = image;
   }
-
 
 
 }

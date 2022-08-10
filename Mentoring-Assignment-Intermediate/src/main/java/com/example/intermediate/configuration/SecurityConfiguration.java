@@ -13,9 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,9 +40,9 @@ public class SecurityConfiguration{
   }
 
   @Bean
-  public WebSecurityCustomizer webSecurityCustomizer(){
-    return web -> web.ignoring()
-            .antMatchers("/h2-console/**");
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    // h2-console 사용에 대한 허용 (CSRF, FrameOptions 무시)
+    return (web) -> web.ignoring();
   }
 
   @Bean
@@ -53,7 +51,10 @@ public class SecurityConfiguration{
     http.cors();
 
     http.csrf().disable()
-
+        .headers()
+        .frameOptions()
+        .sameOrigin()
+        .and()
         .exceptionHandling()
         .authenticationEntryPoint(authenticationEntryPointException)
         .accessDeniedHandler(accessDeniedHandlerException)
@@ -69,7 +70,6 @@ public class SecurityConfiguration{
         .antMatchers("/api/comment/**").permitAll()
         .antMatchers("/h2-console/**").permitAll()
         .anyRequest().authenticated()
-
         .and()
         .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
 
