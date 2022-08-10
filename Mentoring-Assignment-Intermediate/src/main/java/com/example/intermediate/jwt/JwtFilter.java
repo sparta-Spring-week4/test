@@ -57,6 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
         claims = e.getClaims();
       }
 
+      // 만료시간 체크
       if (claims.getExpiration().toInstant().toEpochMilli() < Instant.now().toEpochMilli()) {
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(
