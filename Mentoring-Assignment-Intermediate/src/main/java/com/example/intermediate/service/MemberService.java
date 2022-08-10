@@ -29,7 +29,6 @@ public class MemberService {
   private final MemberRepository memberRepository;
   private final CommentRepository commentRepository;
   private final PasswordEncoder passwordEncoder;
-//  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
 
   MemberService(PostRepository postRepository, MemberRepository memberRepository, CommentRepository commentRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider){
@@ -96,30 +95,6 @@ public class MemberService {
     );
   }
 
-//  @Transactional
-//  public ResponseDto<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-//    if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-//      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-//    }
-//    Member member = tokenProvider.getMemberFromAuthentication();
-//    if (null == member) {
-//      return ResponseDto.fail("MEMBER_NOT_FOUND",
-//          "사용자를 찾을 수 없습니다.");
-//    }
-//
-//    Authentication authentication = tokenProvider.getAuthentication(request.getHeader("Access-Token"));
-//    RefreshToken refreshToken = tokenProvider.isPresentRefreshToken(member);
-//
-//    if (!refreshToken.getValue().equals(request.getHeader("Refresh-Token"))) {
-//      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-//    }
-//
-//    TokenDto tokenDto = tokenProvider.generateTokenDto(member);
-//    refreshToken.updateValue(tokenDto.getRefreshToken());
-//    tokenToHeaders(tokenDto, response);
-//    return ResponseDto.success("success");
-//  }
-
   public ResponseDto<?> logout(HttpServletRequest request) {
     if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
       return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
@@ -162,45 +137,6 @@ public class MemberService {
                     .commentList(myCommentList)
                     .build()
     );
-  }
-//  @Transactional
-//  public ResponseDto<?> MypagePost(HttpServletRequest request) {
-//    if (null == request.getHeader("Refresh-Token")){
-//      return  ResponseDto.fail("NOT_FOUND","로그인이 필요합니다.");
-//    }
-//    if (null == request.getHeader("Authorization")){
-//      return  ResponseDto.fail("NOT_FOUND","로그인이 필요합니다.");
-//    }
-//    Member member = validateMember(request);
-//    if (null == member){
-//      return  ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-//    }
-//
-//    List<Post> postList = postRepository.findByMemberId(member.getId());
-//    List<MypagePostResponseDto> mypagePostResponseDto = new ArrayList<>();
-//
-//    // 게시글 목록 조회 response
-//    for(Post post : postList){
-//      mypagePostResponseDto.add(
-//              MypagePostResponseDto.builder()
-//                      .id(post.getId())
-//                      .title(post.getTitle())
-//                      .author(post.getMember().getNickname())
-//                      .postHeartCount(post.getPostHeartCount())
-//                      .createdAt(post.getCreatedAt())
-//                      .modifiedAt(post.getModifiedAt())
-//                      .build()
-//      );
-//    }
-//    return ResponseDto.success(mypagePostResponseDto);
-//  }
-
-  @Transactional
-  public Member validateMember(HttpServletRequest request) {
-    if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-      return null;
-    }
-    return tokenProvider.getMemberFromAuthentication();
   }
 
   @Transactional(readOnly = true)

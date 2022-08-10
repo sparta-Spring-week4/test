@@ -47,10 +47,4 @@ public class PostController {
     return postService.deletePost(id, request);
   }
 
-
-//  @RequestMapping(value = "/api/auth/post/MypagePost", method = RequestMethod.GET)
-//  public ResponseDto<?> myPage(HttpServletRequest request) {
-//    return memberService.MypagePost(request);
-//  }
-
 }
