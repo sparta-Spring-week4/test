@@ -1,12 +1,12 @@
 package com.example.intermediate.domain;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +27,8 @@ public class RefreshToken extends Timestamped {
   @OneToOne(fetch = FetchType.LAZY)
   private Member member;
 
-  @Column(nullable = false, name="tokenValue")
+
+  @Column(name="token_value", nullable = false)
   private String value;
 
   public void updateValue(String token) {
