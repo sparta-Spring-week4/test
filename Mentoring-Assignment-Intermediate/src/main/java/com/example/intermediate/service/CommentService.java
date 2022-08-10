@@ -15,6 +15,9 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.intermediate.util.CheckMemberUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +30,8 @@ public class CommentService {
   private final CommentCustomRepository commentCustomRepository;
   private final CheckMemberUtil checkMemberUtil;
 
+
   @Transactional
-  @LoginCheck
   public ResponseDto<?> createComment(CommentRequestDto requestDto, HttpServletRequest request) {
 
     Member member = checkMemberUtil.validateMember(request);
@@ -37,6 +40,7 @@ public class CommentService {
     }
 
     Post post = checkMemberUtil.isPresentPost(requestDto.getPostId());
+
     if (null == post) {
       return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
     }
@@ -59,6 +63,7 @@ public class CommentService {
         .post(post)
         .content(requestDto.getContent())
         .build();
+
     // 자식댓글인경우 부모댓글을 설정해준다.
     if(null != parent){
       comment.updateParent(parent);
@@ -111,6 +116,7 @@ public class CommentService {
               else commentResponseDtoList.add(cdto);
             }
       );
+
     return ResponseDto.success(commentResponseDtoList);
   }
 
@@ -123,12 +129,16 @@ public class CommentService {
       return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
     }
 
+
     Post post = checkMemberUtil.isPresentPost(requestDto.getPostId());
+
     if (null == post) {
       return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
     }
 
+
     Comment comment = checkMemberUtil.isPresentComment(id);
+
     if (null == comment) {
       return ResponseDto.fail("NOT_FOUND", "존재하지 않는 댓글 id 입니다.");
     }
@@ -158,7 +168,9 @@ public class CommentService {
       return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
     }
 
+
     Comment comment = checkMemberUtil.isPresentComment(id);
+
     if (null == comment) {
       return ResponseDto.fail("NOT_FOUND", "존재하지 않는 댓글 id 입니다.");
     }

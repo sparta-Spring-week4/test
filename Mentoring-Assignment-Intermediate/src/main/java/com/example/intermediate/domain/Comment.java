@@ -3,13 +3,18 @@ package com.example.intermediate.domain;
 import com.example.intermediate.controller.request.CommentRequestDto;
 
 import javax.persistence.*;
-
-import com.example.intermediate.controller.response.CommentResponseDto;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Parent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +49,14 @@ public class Comment extends Timestamped {
   @OneToMany(mappedBy = "parent", orphanRemoval = true)
   private List<Comment> children = new ArrayList<>();
 
+  @Column
+  @Builder.Default
+  private Long commentHeartCount = 0L;
+
+  @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Heart> hearts;
+
+
   public void update(CommentRequestDto commentRequestDto) {
     this.content = commentRequestDto.getContent();
   }
@@ -56,4 +69,10 @@ public class Comment extends Timestamped {
   public boolean validateMember(Member member) {
     return !this.member.equals(member);
   }
+
+  public void commentHeartUpdate(Long heartCount){
+    this.commentHeartCount = heartCount;
+    System.out.println("commentHeartCount: " + commentHeartCount);
+  }
+
 }

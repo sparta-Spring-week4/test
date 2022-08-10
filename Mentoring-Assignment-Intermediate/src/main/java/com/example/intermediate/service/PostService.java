@@ -1,7 +1,10 @@
 package com.example.intermediate.service;
 
+
 import com.example.intermediate.annotation.LoginCheck;
 import com.example.intermediate.controller.response.CommentResponseDto;
+
+import com.example.intermediate.controller.response.PostListResponseDto;
 import com.example.intermediate.controller.response.PostResponseDto;
 import com.example.intermediate.domain.Comment;
 import com.example.intermediate.domain.Member;
@@ -16,6 +19,10 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.intermediate.util.CheckMemberUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,12 +61,14 @@ public class PostService {
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
+            .postHeartCount(post.getPostHeartCount())
             .build()
     );
   }
 
   @Transactional(readOnly = true)
   public ResponseDto<?> getPost(Long id) {
+
     Post post = checkMemberUtil.isPresentPost(id);
 
     if (null == post) {
@@ -90,13 +99,45 @@ public class PostService {
             .author(post.getMember().getNickname())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
+            .postHeartCount(post.getPostHeartCount())
             .build()
     );
   }
 
   @Transactional(readOnly = true)
   public ResponseDto<?> getAllPost() {
-    return ResponseDto.success(postRepository.findAllByOrderByModifiedAtDesc());
+    List<Post> postList = postRepository.findAllByOrderByModifiedAtDesc();
+    List<PostListResponseDto> postResponseDtoList = new ArrayList<>();
+
+    // 댓글 수
+    List<Comment> commentList = new ArrayList<>();
+
+    for(Post post : postList){
+      List<Comment> postCommentList = post.getComments();
+      for(Comment comment : postCommentList){
+        if(comment.getParent() == null){
+            commentList.add(comment);
+        }
+      }
+    }
+
+    // 게시글 목록 조회 response
+    for(Post post : postList){
+      postResponseDtoList.add(
+        PostListResponseDto.builder()
+              .id(post.getId())
+              .title(post.getTitle())
+              .author(post.getMember().getNickname())
+              .postHeartCount(post.getPostHeartCount())
+              .commentCount((long) commentList.size())
+              .createdAt(post.getCreatedAt())
+              .modifiedAt(post.getModifiedAt())
+              .build()
+      );
+    }
+
+    return ResponseDto.success(postResponseDtoList);
+
   }
 
   @Transactional
@@ -104,11 +145,13 @@ public class PostService {
   public ResponseDto<Post> updatePost(Long id, PostRequestDto requestDto, HttpServletRequest request) {
 
     Member member = checkMemberUtil.validateMember(request);
+
     if (null == member) {
       return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
     }
 
     Post post = checkMemberUtil.isPresentPost(id);
+
     if (null == post) {
       return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
     }
@@ -130,7 +173,9 @@ public class PostService {
       return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
     }
 
+
     Post post = checkMemberUtil.isPresentPost(id);
+
     if (null == post) {
       return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
     }

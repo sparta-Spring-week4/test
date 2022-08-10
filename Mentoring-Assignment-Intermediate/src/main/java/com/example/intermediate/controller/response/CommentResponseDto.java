@@ -18,8 +18,10 @@ public class CommentResponseDto {
   private Long id;
   private String author;
   private String content;
+  private Long commentHeartCount;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
+
   // 대댓글
   private Long parentId;
   private List<CommentResponseDto> children = new ArrayList<>();
@@ -36,6 +38,7 @@ public class CommentResponseDto {
     this.content = comment.getContent();
     this.createdAt = comment.getCreatedAt();
     this.modifiedAt = comment.getModifiedAt();
+    this.commentHeartCount = comment.getCommentHeartCount();
   }
 
 }
