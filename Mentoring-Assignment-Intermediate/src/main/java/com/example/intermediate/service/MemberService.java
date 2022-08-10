@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
+
 @Service
 public class MemberService {
 
@@ -29,6 +29,12 @@ public class MemberService {
   private final PasswordEncoder passwordEncoder;
 //  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
+
+  MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider){
+    this.memberRepository = memberRepository;
+    this. passwordEncoder = passwordEncoder;
+    this.tokenProvider = tokenProvider;
+  }
 
   @Transactional
   public ResponseDto<?> createMember(MemberRequestDto requestDto) {
