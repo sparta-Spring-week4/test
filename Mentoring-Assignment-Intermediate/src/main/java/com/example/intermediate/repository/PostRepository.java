@@ -13,4 +13,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
   @Query("select p from Post p left join fetch Comment c On p.id = c.post.id where c is Null") // (1)
   List<Post> findEmptyPost();
+
+  List<Post> findAllByMemberId(Long id);
 }

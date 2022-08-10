@@ -26,13 +26,4 @@ public class MemberHistResponseDto {
     private List<Post> likedPostList;  // 좋아요 누른 게시글 리스트
     private List<Comment> likedCommentList;  // 좋아요 누른 댓글 리스트
 
-//    public MemberHistResponseDto(Member entity) {
-//        this.id = entity.getId();
-//        this.author = entity.getNickname();
-//        this.postList = entity.getPostList().
-//        this.commentList = entity.getCommentList();
-//        this.reCommentList = entity.getReCommentList();
-//        this.likedPostList = getLikedPostList();
-//        this.likedCommentList = getLikedCommentList();
-//    }
 }

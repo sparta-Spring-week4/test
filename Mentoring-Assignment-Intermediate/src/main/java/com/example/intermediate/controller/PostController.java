@@ -3,6 +3,7 @@ package com.example.intermediate.controller;
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.domain.Post;
+import com.example.intermediate.service.MemberService;
 import com.example.intermediate.service.PostService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RestController
 public class PostController {
-
+  private final MemberService memberService;
   private final PostService postService;
 
 
@@ -45,7 +46,5 @@ public class PostController {
       HttpServletRequest request) {
     return postService.deletePost(id, request);
   }
-
-
 
 }
