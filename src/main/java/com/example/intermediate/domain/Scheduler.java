@@ -22,7 +22,7 @@ public class Scheduler {
         List<Post> posts = postRepository.findEmptyPost();
         for( Post post : posts){
             postRepository.delete(post);
-            log.info("info log={}", post.getId()+"번 게시글이 삭제됬습니다.");
+            log.info("게시물 <" + post.getTitle() + ">이 삭제됬습니다.");
         }
     }
 
