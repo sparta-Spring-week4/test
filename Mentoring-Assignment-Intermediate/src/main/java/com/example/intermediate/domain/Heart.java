@@ -31,4 +31,13 @@ public class Heart {
     @ManyToOne
     private Comment comment;
 
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Column
+    @Builder.Default
+    private Long postHeartCount = 0L;
 }

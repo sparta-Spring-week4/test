@@ -1,5 +1,7 @@
 package com.example.intermediate.repository;
 
+import com.example.intermediate.domain.Heart;
+import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.Post;
 import java.util.List;
 import java.util.Optional;
@@ -15,4 +17,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   List<Post> findEmptyPost();
 
   List<Post> findAllByMemberId(Long id);
+
 }

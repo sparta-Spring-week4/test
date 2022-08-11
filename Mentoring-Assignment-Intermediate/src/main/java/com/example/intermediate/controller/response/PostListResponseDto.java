@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 public class PostListResponseDto {
     private Long id;
     private String title;
-    private String content;
-    private String imgUrl;
     private String author;
     private Long postHeartCount;
     private Long commentCount;

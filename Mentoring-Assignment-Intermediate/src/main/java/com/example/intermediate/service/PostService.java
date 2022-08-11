@@ -127,8 +127,6 @@ public class PostService {
         PostListResponseDto.builder()
               .id(post.getId())
               .title(post.getTitle())
-              .content(post.getContent())
-              .imgUrl(post.getImgUrl())
               .author(post.getMember().getNickname())
               .postHeartCount(post.getPostHeartCount())
               .commentCount((long) commentList.size())

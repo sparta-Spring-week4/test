@@ -1,7 +1,8 @@
 package com.example.intermediate.service;
 
+import com.example.intermediate.controller.request.HeartRequestDto;
 import com.example.intermediate.controller.response.*;
-import com.example.intermediate.domain.Comment;
+import com.example.intermediate.domain.Heart;
 import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.Post;
 import com.example.intermediate.controller.request.LoginRequestDto;
@@ -32,13 +33,15 @@ public class MemberService {
   private final CommentRepository commentRepository;
   private final PasswordEncoder passwordEncoder;
   private final TokenProvider tokenProvider;
+  private final HeartRepository heartRepository;
 
-  MemberService(PostRepository postRepository, MemberRepository memberRepository, CommentRepository commentRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider){
+  MemberService(PostRepository postRepository, MemberRepository memberRepository, CommentRepository commentRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider, HeartRepository heartRepository){
     this.postRepository = postRepository;
     this.memberRepository = memberRepository;
     this.commentRepository = commentRepository;
     this. passwordEncoder = passwordEncoder;
     this.tokenProvider = tokenProvider;
+    this.heartRepository = heartRepository;
   }
 
   @Transactional
@@ -111,7 +114,7 @@ public class MemberService {
   }
 
   @Transactional
-  public ResponseDto<?> getAllMemberHist(UserDetailsImpl userDetails) {
+  public ResponseDto<?> getAllMemberHist(UserDetailsImpl userDetails, HeartRequestDto requestDto) {
 
     List<Post> myPostList = postRepository.findAllByMemberId(userDetails.getMember().getId()); // 빌더
     List<PostResponseDto> postResponseDtoList = new ArrayList<>();
@@ -122,13 +125,7 @@ public class MemberService {
                       .id(post.getId())
                       .title(post.getTitle())
                       .content(post.getContent())
-<<<<<<< HEAD
                       .postHeartCount(post.getPostHeartCount())
-=======
-                      .imgUrl(post.getImgUrl())
-                      .postHeartCount(post.getPostHeartCount())
-                      .author(userDetails.getUsername())
->>>>>>> ecc94298dc0cbf2a91e7562c048e2eab1f1864ce
                       .createdAt(post.getCreatedAt())
                       .modifiedAt(post.getModifiedAt())
                       .build()
@@ -137,22 +134,22 @@ public class MemberService {
 
 
     List<CommentResponseDto> myCommentList = commentRepository.findAllByMemberId(userDetails.getMember().getId());
-    List<CommentResponseDto> myCommentList1 = commentRepository.findAllByMemberId(userDetails.getMember().getId());
 
-    List<Post> mylikedPostList = postRepository.findAllByMemberId(userDetails.getMember().getId());
+    List<Heart> mylikedPostList = heartRepository.findByPostId(requestDto.getPostId());// 좋아요 누른 파라미터값 가져오기
     List<Post> postResponseDtoLikeList = new ArrayList<>();
 
-    for (Post post : mylikedPostList){
+    for (Heart heart : mylikedPostList){
       postResponseDtoLikeList.add(
               Post.builder()
-                      .id(post.getId())
-                      .title(post.getTitle())
-                      .content(post.getContent())
-                      .postHeartCount(post.getPostHeartCount())
+                      .id(heart.getId())
+                      .title(heart.getTitle())
+                      .content(heart.getContent())
+                      .postHeartCount(heart.getPostHeartCount())
                       .build()
       );
     }
 
+    List<CommentResponseDto> myCommentList1 = commentRepository.findAllByMemberId(userDetails.getMember().getId());
 
     return ResponseDto.success(
             MemberHistResponseDto.builder()
