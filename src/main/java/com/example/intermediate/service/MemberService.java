@@ -119,6 +119,8 @@ public class MemberService {
               PostResponseDto.builder()
                       .id(post.getId())
                       .title(post.getTitle())
+                      .author(userDetails.getUsername())
+                      .postHeartCount(post.getPostHeartCount())
                       .content(post.getContent())
                       .createdAt(post.getCreatedAt())
                       .modifiedAt(post.getModifiedAt())
