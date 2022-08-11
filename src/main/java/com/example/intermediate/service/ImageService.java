@@ -26,8 +26,12 @@ public class ImageService {
     private String bucketName = "hanghae7zo";
 
     @Transactional
-    public ResponseDto<?> uploadFileV1(MultipartFile multipartFile) throws IOException {
-        validateFileExists(multipartFile);
+    public ResponseDto<?> uploadFileV1(MultipartFile multipartFile){
+        try {
+            validateFileExists(multipartFile);
+        }catch (Exception e){
+            return ResponseDto.fail("FILE_EMPTY", "파일이 비었습니다.");
+        }
 
         String fileName = CommonUtils.buildFileName(multipartFile.getOriginalFilename());
 
@@ -40,9 +44,14 @@ public class ImageService {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, byteArrayInputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicReadWrite));
         } catch (IOException e) {
-            throw new IOException("변환에 실패했습니다.");
+            return ResponseDto.fail("BAD_TRANSLATION", "변환에 실패했습니다.");
         }
-        String imgName = amazonS3Client.getUrl(bucketName, fileName).toString();
+        String imgName;
+        try {
+            imgName = amazonS3Client.getUrl(bucketName, fileName).toString();
+        }catch (Exception e){
+            return ResponseDto.fail("UPLOAD_fAIL", "업로드에 실패했습니다.");
+        }
         return ResponseDto.success(imgName);
     }
 
