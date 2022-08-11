@@ -22,8 +22,8 @@ import java.io.InputStream;
 public class ImageService {
     private final AmazonS3Client amazonS3Client;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
+    // @Value("${cloud.aws.s3.bucket}")
+    private String bucketName = "hanghae7zo";
 
     @Transactional
     public ResponseDto<?> uploadFileV1(MultipartFile multipartFile) throws IOException {
